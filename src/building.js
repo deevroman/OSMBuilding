@@ -214,7 +214,7 @@ class Building {
       // Filter to all ways
       var parts = this.fullXmlData.getElementsByTagName('way');
       for (const xmlPart of parts) {
-        if (xmlPart.querySelector('[k="building:part"]')) {
+        if (xmlPart.querySelector('[k="building:part"]:not([v="no"])')) {
           const id = xmlPart.getAttribute('id');
           const part = new BuildingPart(id, this.fullXmlData, this.nodelist, this.outerElement.options);
           if (this.partIsInside(part)) {
@@ -225,7 +225,7 @@ class Building {
       // Filter all relations
       parts = this.fullXmlData.getElementsByTagName('relation');
       for (let i = 0; i < parts.length; i++) {
-        if (parts[i].querySelector('[k="building:part"]')) {
+        if (parts[i].querySelector('[k="building:part"]:not([v="no"])')) {
           const id = parts[i].getAttribute('id');
           try {
             this.parts.push(new MultiBuildingPart(id, this.fullXmlData, this.nodelist, this.outerElement.options));
