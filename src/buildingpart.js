@@ -108,7 +108,7 @@ class BuildingPart {
     specifiedOptions.building.levelsUnderground = this.getAttribute('building:levels:underground');
     specifiedOptions.building.material = this.getAttribute('building:material');
     specifiedOptions.building.minHeight = BuildingPart.normalizeLength(this.getAttribute('min_height'));
-    specifiedOptions.building.minLevel = this.getAttribute('building:min_level');
+    specifiedOptions.building.minLevel = BuildingPart.normalizeNumber(this.getAttribute('building:min_level'));
     specifiedOptions.building.walls = this.getAttribute('walls');
     specifiedOptions.roof.angle = this.getAttribute('roof:angle');
     specifiedOptions.roof.colour = this.getAttribute('roof:colour');
@@ -129,7 +129,9 @@ class BuildingPart {
     calculatedOptions.building.levelsUnderground = this.options.specified.building.levelsUnderground ?? this.options.inherited.building.levelsUnderground;
     calculatedOptions.building.material = this.options.specified.building.material ?? this.options.inherited.building.material;
     calculatedOptions.building.minLevel = this.options.specified.building.minLevel ?? this.options.inherited.building.minLevel;
-    calculatedOptions.building.minHeight = this.options.specified.building.minHeight ?? this.options.inherited.building.minHeight ?? 0;
+    calculatedOptions.building.minHeight = this.options.specified.building.minHeight
+                                        ?? this.options.inherited.building.minHeight
+                                        ?? (this.options.specified.building.minLevel ? this.options.specified.building.minLevel * 3 : null);
     calculatedOptions.building.walls = this.options.specified.building.walls ?? this.options.inherited.building.walls;
     calculatedOptions.roof.angle = this.options.specified.roof.angle ?? this.options.inherited.roof.angle;
     calculatedOptions.roof.colour = this.options.specified.roof.colour ?? this.options.inherited.roof.colour;
@@ -176,7 +178,7 @@ class BuildingPart {
     if (this.options.roof.shape === 'skillion' && this.options.roof.direction === undefined) {
       window.printError('Part ' + this.id + ' requires a direction. (https://wiki.openstreetmap.org/wiki/Key:roof:direction)');
     }
-    this.extrusionHeight = this.options.building.height - this.options.building.minHeight - this.options.roof.height;
+    this.extrusionHeight = this.options.building.height - (this.options.building.minHeight ?? 0) - this.options.roof.height;
   }
 
   /**
@@ -202,7 +204,7 @@ class BuildingPart {
   }
 
   createBuilding() {
-    let extrusionHeight = this.options.building.height - this.options.building.minHeight - this.options.roof.height;
+    let extrusionHeight = this.options.building.height - (this.options.building.minHeight ?? 0) - this.options.roof.height;
 
     let extrudeSettings = {
       bevelEnabled: false,
@@ -216,7 +218,7 @@ class BuildingPart {
 
     // Change the position to compensate for the min_height
     mesh.rotation.x = -Math.PI / 2;
-    mesh.position.set( 0, this.options.building.minHeight, 0);
+    mesh.position.set( 0, this.options.building.minHeight ?? 0, 0);
     mesh.name = 'b' + this.id;
     return mesh;
   }
